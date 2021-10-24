@@ -22,10 +22,11 @@ def define_argparser():
 
     p.add_argument('--model_fn', required=True)
     p.add_argument('--train_fn', required=True)
+    p.add_argument('--test_fn', required=True)
+
     p.add_argument('--pretrained_model_name', type=str, default='bert-base-uncased')
     
     p.add_argument('--gpu_id', type=int, default=-1)
-    p.add_argument('--verbose', type=int, default=2)
 
     p.add_argument('--batch_size', type=int, default=32)
     p.add_argument('--n_epochs', type=int, default=10)
