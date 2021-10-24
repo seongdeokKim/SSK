@@ -17,7 +17,7 @@ class Trainer:
 
     def train(
             self,
-            model, crit, optimizer, scheduler,
+            model, optimizer, scheduler,
             train_loader, valid_loader,
             device,
     ):
@@ -122,7 +122,7 @@ class Trainer:
 
     def test(
             self,
-            model, crit, test_loader, device,
+            model, test_loader, device,
     ):
 
         # Put the model into evaluation mode

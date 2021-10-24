@@ -152,10 +152,6 @@ def main(config):
             eps=config.adam_epsilon
         )
 
-    # By default, model returns a hidden representation before softmax func.
-    # Thus, we need to use CrossEntropyLoss, which combines LogSoftmax and NLLLoss.
-    crit = nn.CrossEntropyLoss()
-
     n_total_iterations = len(train_loader) * config.n_epochs
     n_warmup_steps = int(n_total_iterations * config.warmup_ratio)
     scheduler = get_linear_schedule_with_warmup(
@@ -174,13 +170,11 @@ def main(config):
         print('"""""" CPU ON """""" ')
 
     model.to(device)
-    #crit.to(crit)
 
     # Start train.
     trainer = Trainer(config)
     model = trainer.train(
         model,
-        crit,
         optimizer,
         scheduler,
         train_loader,
@@ -190,7 +184,6 @@ def main(config):
 
     trainer.test(
         model,
-        crit,
         test_loader,
         device,
     )
