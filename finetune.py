@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader
 from transformers import AutoTokenizer
 
 from transformers import BertForSequenceClassification
+from transformers import AlbertForSequenceClassification
 from transformers import RobertaForSequenceClassification
 from transformers import ElectraForSequenceClassification
 from transformers import XLNetForSequenceClassification
@@ -122,6 +123,11 @@ def get_pretrained_language_model(model_name, index_to_label):
             config.pretrained_model_name,
             num_labels=len(index_to_label)
         )
+    elif 'albert' in model_name:
+        model = AlbertForSequenceClassification.from_pretrained(
+            config.pretrained_model_name,
+            num_labels=len(index_to_label),
+        )
     elif 'electra' in model_name:
         model = ElectraForSequenceClassification.from_pretrained(
             config.pretrained_model_name,
@@ -218,10 +224,8 @@ def main(config):
     )
 
     torch.save({
-        'bert': model.state_dict() if 'bert' in config.pretrained_model_name else None,
-        'electra' : model.state_dict() if 'electra' in config.pretrained_model_name else None,
-        'roberta': model.state_dict() if 'roberta' in config.pretrained_model_name else None,
-        'xlnet' : model.state_dict() if 'bert' in config.pretrained_model_name else None,
+        'model_name': config.pretrained_model_name,
+        'finetuned_model': model.state_dict(),
         'config': config,
         'vocab': None,
         'classes': index_to_label,
