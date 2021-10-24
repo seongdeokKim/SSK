@@ -60,12 +60,9 @@ class Trainer:
                 # Update the learning rate.
                 scheduler.step()
 
-                if (step+1) % 100 == 0:
-                    print(f'{step+1}/{len(train_loader)} iter finished')
-
             # Calculate the average loss over the training data.
             avg_tr_loss = total_tr_loss / len(train_loader)
-            print('Epoch {} - loss={:.4e}'.format(
+            print('Epoch {}\nTraining - loss={:.4e}'.format(
                 epoch+1,
                 avg_tr_loss
             ))
@@ -106,9 +103,6 @@ class Trainer:
                         accuracy = 0
 
                     total_val_accuracy += float(accuracy)
-
-                if (step+1) % 100 == 0:
-                    print(f'{step+1}/{len(train_loader)} iter finished')
 
             avg_val_loss = total_val_loss / len(valid_loader)
             avg_val_acc = total_val_accuracy / len(valid_loader)
