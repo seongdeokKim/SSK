@@ -7,7 +7,12 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 from transformers import AutoTokenizer
+
 from transformers import BertForSequenceClassification
+from transformers import RobertaForSequenceClassification
+from transformers import ElectraForSequenceClassification
+from transformers import XLNetForSequenceClassification
+
 from transformers import AdamW
 from transformers import get_linear_schedule_with_warmup
 
@@ -110,13 +115,42 @@ def get_loaders(config, tokenizer):
 
     return index_to_label, train_loader, valid_loader, test_loader
 
+def get_pretrained_language_model(model_name, index_to_label):
+
+    if 'bert' in model_name:
+        model = BertForSequenceClassification.from_pretrained(
+            config.pretrained_model_name,
+            num_labels=len(index_to_label)
+        )
+    elif 'electra' in model_name:
+        model = ElectraForSequenceClassification.from_pretrained(
+            config.pretrained_model_name,
+            num_labels=len(index_to_label)
+        )
+    elif 'roberta' in model_name:
+        model = RobertaForSequenceClassification.from_pretrained(
+            config.pretrained_model_name,
+            num_labels=len(index_to_label)
+        )
+    elif 'xlnet' in model_name:
+        model = XLNetForSequenceClassification.from_pretrained(
+            config.pretrained_model_name,
+            num_labels=len(index_to_label)
+        )
+
+    return model
 
 def main(config):
+
     # Get pretrained tokenizer.
     tokenizer = AutoTokenizer.from_pretrained(config.pretrained_model_name)
 
     # Get dataloaders using tokenizer from untokenized corpus.
     index_to_label, train_loader, valid_loader, test_loader = get_loaders(config, tokenizer)
+
+    # Get pretrained model with specified softmax layer.
+    model = get_pretrained_language_model(config.pretrained_model_name, index_to_label)
+
 
     print(
         '|train| =', len(train_loader) * config.batch_size,
@@ -124,11 +158,6 @@ def main(config):
         '|test| =', len(test_loader) * config.batch_size,
     )
 
-    # Get pretrained model with specified softmax layer.
-    model = BertForSequenceClassification.from_pretrained(
-        config.pretrained_model_name,
-        num_labels=len(index_to_label)
-    )
 
     if config.use_radam:
         optimizer = custom_optim.RAdam(model.parameters(), lr=config.lr)
@@ -189,7 +218,10 @@ def main(config):
     )
 
     torch.save({
-        'bert': model.state_dict(),
+        'bert': model.state_dict() if 'bert' in config.pretrained_model_name else None,
+        'electra' : model.state_dict() if 'electra' in config.pretrained_model_name else None,
+        'roberta': model.state_dict() if 'roberta' in config.pretrained_model_name else None,
+        'xlnet' : model.state_dict() if 'bert' in config.pretrained_model_name else None,
         'config': config,
         'vocab': None,
         'classes': index_to_label,
