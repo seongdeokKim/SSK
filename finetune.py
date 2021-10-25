@@ -8,11 +8,11 @@ from torch.utils.data import DataLoader
 
 from transformers import AutoTokenizer
 
-from transformers import BertForSequenceClassification
-from transformers import AlbertForSequenceClassification
-from transformers import RobertaForSequenceClassification
-from transformers import ElectraForSequenceClassification
-from transformers import XLNetForSequenceClassification
+from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import AlbertTokenizer, AlbertForSequenceClassification
+from transformers import RobertaTokenizer, RobertaForSequenceClassification
+from transformers import ElectraTokenizer, ElectraForSequenceClassification
+from transformers import XLNetTokenizer, XLNetForSequenceClassification
 
 from transformers import AdamW
 from transformers import get_linear_schedule_with_warmup
@@ -116,31 +116,45 @@ def get_loaders(config, tokenizer):
 
     return index_to_label, train_loader, valid_loader, test_loader
 
+def get_tokenizer(model_name):
+    if 'bert' in model_name:
+        tokenizer = BertTokenizer.from_pretrained(model_name)
+    elif 'albert' in model_name:
+        tokenizer = AlbertTokenizer.from_pretrained(model_name)
+    elif 'electra' in model_name:
+        tokenizer = ElectraTokenizer.from_pretrained(model_name)
+    elif 'roberta' in model_name:
+        tokenizer = RobertaTokenizer.from_pretrained(model_name)
+    elif 'xlnet' in model_name:
+        tokenizer = XLNetTokenizer.from_pretrained(model_name)
+
+    return tokenizer
+
 def get_pretrained_language_model(model_name, index_to_label):
 
     if 'bert' in model_name:
         model = BertForSequenceClassification.from_pretrained(
-            config.pretrained_model_name,
+            model_name,
             num_labels=len(index_to_label)
         )
     elif 'albert' in model_name:
         model = AlbertForSequenceClassification.from_pretrained(
-            config.pretrained_model_name,
+            model_name,
             num_labels=len(index_to_label),
         )
     elif 'electra' in model_name:
         model = ElectraForSequenceClassification.from_pretrained(
-            config.pretrained_model_name,
+            model_name,
             num_labels=len(index_to_label)
         )
     elif 'roberta' in model_name:
         model = RobertaForSequenceClassification.from_pretrained(
-            config.pretrained_model_name,
+            model_name,
             num_labels=len(index_to_label)
         )
     elif 'xlnet' in model_name:
         model = XLNetForSequenceClassification.from_pretrained(
-            config.pretrained_model_name,
+            model_name,
             num_labels=len(index_to_label)
         )
 
@@ -149,7 +163,7 @@ def get_pretrained_language_model(model_name, index_to_label):
 def main(config):
 
     # Get pretrained tokenizer.
-    tokenizer = AutoTokenizer.from_pretrained(config.pretrained_model_name)
+    tokenizer = get_tokenizer(config.pretrained_model_name)
 
     # Get dataloaders using tokenizer from untokenized corpus.
     index_to_label, train_loader, valid_loader, test_loader = get_loaders(config, tokenizer)
