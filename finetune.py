@@ -117,9 +117,8 @@ def get_loaders(config, tokenizer):
     return index_to_label, train_loader, valid_loader, test_loader
 
 def get_tokenizer(model_name):
-    if 'bert' in model_name:
-        tokenizer = BertTokenizer.from_pretrained(model_name)
-    elif 'albert' in model_name:
+
+    if 'albert' in model_name:
         tokenizer = AlbertTokenizer.from_pretrained(model_name)
     elif 'electra' in model_name:
         tokenizer = ElectraTokenizer.from_pretrained(model_name)
@@ -127,17 +126,14 @@ def get_tokenizer(model_name):
         tokenizer = RobertaTokenizer.from_pretrained(model_name)
     elif 'xlnet' in model_name:
         tokenizer = XLNetTokenizer.from_pretrained(model_name)
+    elif 'bert' in model_name:
+        tokenizer = BertTokenizer.from_pretrained(model_name)
 
     return tokenizer
 
 def get_pretrained_language_model(model_name, index_to_label):
 
-    if 'bert' in model_name:
-        model = BertForSequenceClassification.from_pretrained(
-            model_name,
-            num_labels=len(index_to_label)
-        )
-    elif 'albert' in model_name:
+    if 'albert' in model_name:
         model = AlbertForSequenceClassification.from_pretrained(
             model_name,
             num_labels=len(index_to_label),
@@ -154,6 +150,11 @@ def get_pretrained_language_model(model_name, index_to_label):
         )
     elif 'xlnet' in model_name:
         model = XLNetForSequenceClassification.from_pretrained(
+            model_name,
+            num_labels=len(index_to_label)
+        )
+    elif 'bert' in model_name:
+        model = BertForSequenceClassification.from_pretrained(
             model_name,
             num_labels=len(index_to_label)
         )
