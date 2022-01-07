@@ -161,13 +161,13 @@ def main(config):
     )
 
 
-    if torch.cuda.is_available() and config.gpu_id >= 0:
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        n_gpu = torch.cuda.device_count()
-        print(f'"""""" {n_gpu} of GPU ON """""" ')
+    if config.gpu_id > -1 and torch.cuda.is_available():
+        device = torch.device("cuda:{}".format(config.gpu_id))
+        print('GPU on')
+        print('Count of using GPUs:', torch.cuda.device_count())
     else:
         device = torch.device("cpu")
-        print('"""""" CPU ON """""" ')
+        print('No GPU')
 
     model.to(device)
 
