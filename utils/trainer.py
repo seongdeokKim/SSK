@@ -24,10 +24,6 @@ class Trainer:
 
         for epoch in range(self.config.n_epochs):
 
-            # ========================================
-            #               Training
-            # ========================================
-
             # Put the model into training mode.
             model.train()
             # Reset the total loss for this epoch.
@@ -67,9 +63,6 @@ class Trainer:
                 avg_tr_loss
             ))
 
-            # ========================================
-            #               Validation
-            # ========================================
 
             # Put the model into evaluation mode
             model.eval()
