@@ -20,6 +20,7 @@ def define_argparser():
     p.add_argument('--model_fn', required=True)
     p.add_argument('--gpu_id', type=int, default=-1)
     p.add_argument('--batch_size', type=int, default=256)
+    p.add_argument('--max_length', type=int, default=320)
     p.add_argument('--top_k', type=int, default=1)
 
     config = p.parse_args()
@@ -68,6 +69,7 @@ def main(config):
         y_hats = []
         for idx in range(0, len(lines), config.batch_size):
             mini_batch = tokenizer(lines[idx:idx + config.batch_size],
+                                   max_length=config.max_length,
                                    padding=True,
                                    truncation=True,
                                    return_tensors="pt")
@@ -86,19 +88,22 @@ def main(config):
 
         # Concatenate the mini-batch wise result
         y_hats = torch.cat(y_hats, dim=0)
-
-        probs, indice = y_hats.cpu().topk(k=config.top_k,
-                                          dim=-1)
+        probs, indices = y_hats.cpu().topk(k=len(index_to_label))
 
         for i in range(len(lines)):
             sys.stdout.write('{}\t{}\t{}\n'.format(
-                str(index_to_label[int(indice[i][0])]),
-                str(probs[i][0]),
+                ",".join([index_to_label.get(int(j)) for j in indices[i][:config.top_k]]),
+                ",".join([str(float(j))[:6] for j in probs[i][:config.top_k]]),
                 lines[i],
             ))
 
 
 if __name__ == '__main__':
 
+    import time
+    start = time.time()
+
     config = define_argparser()
     main(config)
+
+    sys.stdout.write('\n{:.4f} seconds\n'.format(time.time()-start))

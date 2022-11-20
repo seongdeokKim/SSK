@@ -73,24 +73,24 @@ def get_loaders(config, tokenizer):
         index_to_label[i] = label
 
     # Convert label text to integer value.
-    _labels_for_train = list(map(label_to_index.get, labels_for_train))
+    labels_for_train = list(map(label_to_index.get, labels_for_train))
 
     # Shuffle before split into train and validation set.
-    shuffled = list(zip(texts_for_train, _labels_for_train))
+    shuffled = list(zip(texts_for_train, labels_for_train))
     random.shuffle(shuffled)
     texts_for_train = [e[0] for e in shuffled]
-    _labels_for_train = [e[1] for e in shuffled]
+    labels_for_train = [e[1] for e in shuffled]
     idx = int(len(texts_for_train) * .8)
 
     # Get dataloaders using given tokenizer as collate_fn.
     train_loader = DataLoader(
-        BertDataset(texts_for_train[:idx], _labels_for_train[:idx]),
+        BertDataset(texts_for_train[:idx], labels_for_train[:idx]),
         batch_size=config.batch_size,
         shuffle=True,
         collate_fn=TokenizerWrapper(tokenizer, config.max_length).collate,
     )
     valid_loader = DataLoader(
-        BertDataset(texts_for_train[idx:], _labels_for_train[idx:]),
+        BertDataset(texts_for_train[idx:], labels_for_train[idx:]),
         batch_size=config.batch_size,
         collate_fn=TokenizerWrapper(tokenizer, config.max_length).collate,
     )
@@ -100,10 +100,10 @@ def get_loaders(config, tokenizer):
     labels_for_test, texts_for_test = read_text(config.test_fn)
 
     # Convert label text to integer value.
-    _labels_for_test = list(map(label_to_index.get, labels_for_test))
+    labels_for_test = list(map(label_to_index.get, labels_for_test))
 
     test_loader = DataLoader(
-        BertDataset(texts_for_test, _labels_for_test),
+        BertDataset(texts_for_test, labels_for_test),
         batch_size=config.batch_size,
         collate_fn=TokenizerWrapper(tokenizer, config.max_length).collate,
     )
@@ -124,7 +124,7 @@ def main(config):
         '|test| =', len(test_loader) * config.batch_size,
     )
 
-    # Get pretrained model with specified softmax layer.
+    # Get pretrained model
     model = BertForSequenceClassification.from_pretrained(
         config.pretrained_model_name,
         num_labels=len(index_to_label)
