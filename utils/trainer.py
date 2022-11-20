@@ -18,7 +18,7 @@ class Trainer:
     def train(
             self,
             model, optimizer, scheduler,
-d            train_loader, valid_loader,
+            train_loader, valid_loader,
             device,
     ):
 
